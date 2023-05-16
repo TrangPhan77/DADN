@@ -1,0 +1,22 @@
+.main_profile {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    justify-content: center;
+    align-items: center;
+}
+
+.Greenbox {
+    width: 100%;
+    height: 30vh;
+    top: 0px;
+    left: 0px;
+    background-color: #5db075;
+}
+
+.picture {
+    height: 30vh;
+    width: 30vh;
+    justify-content: center;
+    align-items: center;
+}

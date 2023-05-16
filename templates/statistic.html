@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="static/css/statictical-table.css">
+        
+        <script src="static/libs/jquery.min.js"></script>
+        <script src="https://d3js.org/d3.v6.js"></script>
+    </head>
+
+
+    <body>
+        <nav class = "navbar">
+            <div class = nav-bar-2></div>
+    
+            <div class = "DieuHuong_static">
+                <img src = "http://127.0.0.1:5000/static/img/Navbar.png" alt = "Vector" />
+            </div>
+    
+            <div class = "logo">
+                <img class = "irrigation" src = "http://127.0.0.1:5000/static/img/irrigation.png" alt="Irrigation" />
+                <h1 class = "title">SFARM</h1>
+            </div>
+    
+            <ol class = "overlap-group5">
+                <div class = "navnav">
+                    <img class = "vector" src = "http://127.0.0.1:5000/static/img/vector.png" alt = "Vector" />
+                    <a href="{{ url_for('home') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Trang chủ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "icon-person" src = "http://127.0.0.1:5000/static/img/icon-person.png" alt='icon "person"' />
+                    <a href="{{ url_for('profile') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Hồ sơ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "water-pipe" src = "http://127.0.0.1:5000/static/img/water-pipe.png" alt = "Water pipe" />
+                    <a href="{{ url_for('control_pump') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Máy bơm</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-2 vector-3" src = "http://127.0.0.1:5000/static/img/vector-2.png" alt="Vector" />
+                    <a href="{{ url_for('period') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới định kì</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "calculator" src = "http://127.0.0.1:5000/static/img/Calculator.png" alt="Calculator" />
+                    <a href="{{ url_for('auto') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới tự động</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-1 vector-3" src = "http://127.0.0.1:5000/static/img/vector-1.png" alt="Vector" />
+                    <a href="{{ url_for('statis') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Thống kê</a>
+                </div>
+            </ol>
+        </nav>
+       
+        <div class="container">
+            <div class="header">
+                <span class = "title_header">XEM KẾT QUẢ THỐNG KÊ</span>
+                <img src="http://127.0.0.1:5000/static/img/notify.svg" alt="">
+                <div class="user">
+                    <img class = "avatar" src="http://127.0.0.1:5000/static/img/img.png" alt="">
+                    <span class = "UserName">{{session.UserName}}</span>
+                </div>
+                <a href="{{ url_for('logout') }}"> <img src="http://127.0.0.1:5000/static/img/icon _sign out_.svg" alt="Logout"></a>
+            </div>
+
+            <div class = "search">
+                <!-- <select id = "select_area" class = "overlap-group1 Textsearch manrope-norma-suva-gray-18px">
+                    <option value = "date" selected>Ngày</option>
+                    <option value = "month">Tháng</option>
+                    <option value = "year">Năm</option>
+                </select> -->
+            
+                <select id = "select_unit" onChange = "select_Time()" class = "overlap-group1 Textsearch manrope-norma-suva-gray-18px">
+                    <option value = "date" selected>Ngày</option>
+                    <option value = "month">Tháng</option>
+                    <option value = "year">Năm</option>
+                </select>
+
+                <div id = "search"></div>
+    
+                <button class = "overlap-group Textsearch manrope-semi-bold-white-24px" onclick="histogram()">Tìm kiếm</button>  
+            </div>
+            
+            <div class = "visualization">
+                <div class = "chartList">
+                    <div class = "histogram" id="histogram_temp"></div>
+                    <div class = "histogram" id="histogram_moist"></div>
+                    <div class = "histogram" id="histogram_light"></div>
+                </div>
+
+                <div class = "chartList">
+                    <!-- <div class = "histogram_2"> -->
+                        <div id="pie_pumper"></div>
+                    <!-- </div> -->
+                    
+                    <div class = "histogram_1" id = "area">
+                        <!-- <svg id="my_dataviz"></svg> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+                var time = document.getElementById("search");
+                var select = document.getElementById("select_unit").value;
+
+                var stday = new Date();
+                var sthour = stday.getHours();
+                time.innerHTML = `<input id = "select_Time" type = "${select}" class = "overlap-group2 Textsearch manrope-norma-suva-gray-18px">`
+
+                function select_Time (){
+                    time = document.getElementById("search");
+                    select = document.getElementById("select_unit").value;
+                    
+                    if (select == "year") {
+                        var today = new Date();
+                        var year = today.getFullYear();
+                        time.innerHTML = `<input id = "select_Time" type = "number" max = "${year}" min = "2022" step = "1" class = "overlap-group2 Textsearch manrope-norma-suva-gray-18px">`
+                    }
+                    else time.innerHTML = `<input id = "select_Time" type = "${select}" class = "overlap-group2 Textsearch manrope-norma-suva-gray-18px">`
+                }
+
+                function histogram(){
+                    var select_Time = document.getElementById("select_Time").value;
+                    var type = document.getElementById("select_Time").type;
+                    var start, end, start_before, end_before, unit_select;
+                    
+                    if (type == "number") {
+                        unit_select = "month";
+                        start = select_Time + "-01-01 00:00:00";
+                        end = select_Time + "-12-31 23:59:59";
+
+                        var objTime = new Date(select_Time)
+                        var ReTime = objTime.setFullYear(objTime.getFullYear() - 1)
+                        start_before = objTime.getFullYear() + "-01-01 00:00:00";
+                        end_before = objTime.getFullYear() + "-12-31 23:59:59";
+                    }
+                    else if (type == "month") {
+                        unit_select = "day";
+                        var objTime = new Date(select_Time + "-01 00:00:00");
+                        var dayOfMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                        start = select_Time + "-01 00:00:00";
+                        end = select_Time + "-" + dayOfMonth[objTime.getMonth()] + " 23:59:59";
+
+                        
+                        var ReTime = objTime.setMonth(objTime.getMonth());
+                        if (objTime.getMonth() == "0") {
+                            start_before = objTime.getFullYear() - 1 + "-12-01 00:00:00";
+                            end_before = objTime.getFullYear() - 1 + "-12-31 23:59:59";
+                        }
+                        else {
+                            start_before = objTime.getFullYear() + "-" + objTime.getMonth() + "-01 00:00:00";
+                            end_before = objTime.getFullYear() + "-" + objTime.getMonth() + "-" + dayOfMonth[objTime.getMonth() - 1] + " 23:59:59";
+                        }
+                        
+                    }
+                    else {
+                        unit_select = "hour";
+                        start = select_Time + " 00:00:00";
+                        end = select_Time + " 23:59:59";
+
+                        var objTime = new Date(select_Time)
+                        var ReTime = objTime.setDate(objTime.getDate() - 1)
+                        start_before = objTime.getFullYear() + "-" + objTime.getMonth() + "-" + objTime.getDate() + " 00:00:00";
+                        end_before = objTime.getFullYear() + "-" + objTime.getMonth() + "-" + objTime.getDate() + " 23:59:59";
+                    }
+
+                    d3.select("#temp").remove(); d3.select("#tip_temp").remove();
+                    d3.select("#light").remove(); d3.select("#tip_light").remove();
+                    d3.select("#moist").remove(); d3.select("#tip_moist").remove();
+
+                    const margin = {top: 70, right: 40, bottom: 30, left: 50},
+                        width = 300 - margin.left - margin.right,
+                        height = 400 - margin.top - margin.bottom;
+
+                    // append the svg object to the body of the page
+                    const svg_temp = d3.select("#histogram_temp")
+                    .append("svg")
+                        .attr("id", "temp")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom);
+
+                    const svg_moist = d3.select("#histogram_moist")
+                    .append("svg")
+                        .attr("id", "moist")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom);
+
+                    const svg_light = d3.select("#histogram_light")
+                    .append("svg")
+                        .attr("id", "light")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom);
+
+                    // get the data
+                    var send_data = {area: 1, element: "Temp", unit: unit_select, TimeStart: start, TimeEnd: end};
+                    $.post('/statistical_table', send_data, function(data) {
+                        if (data.length == 0) {
+                            alert("Chưa có dữ liệu")
+                        }
+                        console.log(data)
+
+                        var xScale = d3.scaleBand().range ([0, width]).padding(0.05),
+                            yScale = d3.scaleLinear().range ([height, 0]);
+
+                        var g = svg_temp.append("g")
+                            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                        xScale.domain(data.map(function(d) { return d.offset; }));
+                        yScale.domain([0, 50]);
+
+                        // g.append("g")
+                        // .attr("transform", "translate(0," + height + ")")
+                        // .call(d3.axisBottom(xScale));
+
+                        g.append("g")
+                        .call(d3.axisLeft(yScale).tickFormat(function(d){
+                            return  d + "oC";
+                        }).ticks(10))
+                        .append("text")
+                        .attr("y", 6)
+                        .attr("text-anchor", "end")
+                        .text("value");
+
+                        const tooltip = d3.select("#histogram_temp")
+                                .append("div")
+                                .attr("id", "tip_temp")
+                                .style("opacity", 0)
+                                .attr("class", "tooltip")
+                                .style("background-color", "#5DB075")
+                                .style("color", "white")
+                                .style("border-radius", "5px")
+                                .style("padding", "10px")
+
+                        const showTooltip = function(event,d) {
+                                d3.select(this)
+                                .style("fill", "#B3261E");
+                                tooltip
+                                .transition()
+                                .duration(100)
+                                .style("opacity", 1)
+                                tooltip
+                                .html(d.time)
+                                .style("left", (event.x)/2-100 + "px")
+                                .style("top", (event.y)/2 + "px")
+                        }
+                        const moveTooltip = function(event,d) {
+                                d3.select(this)
+                                .style("fill", "#EDCBC9");
+                                tooltip
+                                .style("left", (event.x)/2-100 + "px")
+                                .style("top", (event.y)/2 + "px")
+                        }
+                            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+                        const hideTooltip = function(event,d) {
+                                tooltip
+                                .transition()
+                                .duration(100)
+                                .style("opacity", 0)
+                        }
+
+                        g.selectAll(".rect")
+                            .data(data)
+                            .join("rect")
+                            .attr("x", function(d) { return xScale(d.offset); })
+                            .attr("y", function(d) { return yScale(d.value); })
+                            .attr("width", xScale.bandwidth())
+                            .attr("height", function(d) { return height - yScale(d.value); })
+                            .style("fill", "#EDCBC9")
+                            .on("mouseover", showTooltip )
+                            .on("mouseout", moveTooltip )
+                            .on("mouseleave", hideTooltip );
+
+                        send_data = {area: 1, element: "Temp", unit: unit_select, TimeStart: start_before, TimeEnd: end_before};
+                        $.post('/statistical_table', send_data, function(data_before) {
+                            g.append("path")
+                                .datum(data_before)
+                                .attr("fill", "none")
+                                .attr("stroke", "#B3261E")
+                                .attr("stroke-width", 0.75)
+                                .attr("d", d3.line()
+                                    .x(function(d) { return xScale(d.offset);})
+                                    .y(function(d) { return yScale(d.value);})
+                                );
+                            });
+
+                    });
+
+                    send_data = {area: 1, element: "Moist", unit: unit_select, TimeStart: start, TimeEnd: end};
+                    console.log(send_data);
+                    $.post('/statistical_table', send_data, function(data) {
+                        console.log(data)
+
+                        var xScale = d3.scaleBand().range ([0, width]).padding(0.05),
+                            yScale = d3.scaleLinear().range ([height, 0]);
+
+                        var g = svg_moist.append("g")
+                            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                        xScale.domain(data.map(function(d) { return d.offset; }));
+                        yScale.domain([0, 100]);
+
+                        // g.append("g")
+                        // .attr("transform", "translate(0," + height + ")")
+                        // .call(d3.axisBottom(xScale));
+
+                        g.append("g")
+                        .call(d3.axisLeft(yScale).tickFormat(function(d){
+                            return  d + "%";
+                        }).ticks(10))
+                        .append("text")
+                        .attr("y", 6)
+                        .attr("text-anchor", "end")
+                        .text("value");
+
+                        const tooltip = d3.select("#histogram_moist")
+                                .append("div")
+                                .attr("id", "tip_moist")
+                                .style("opacity", 0)
+                                .attr("class", "tooltip")
+                                .style("background-color", "#5DB075")
+                                .style("color", "white")
+                                .style("border-radius", "5px")
+                                .style("padding", "10px")
+
+                            // A function that change this tooltip when the user hover a point.
+                            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+                            const showTooltip = function(event,d) {
+                                d3.select(this)
+                                .style("fill", "#2FB8F2");
+                                tooltip
+                                .transition()
+                                .duration(100)
+                                .style("opacity", 1)
+                                tooltip
+                                .html(d.time)
+                                .style("left", (event.x)/2-100 + "px")
+                                .style("top", (event.y)/2 + "px")
+                            }
+                            const moveTooltip = function(event,d) {
+                                d3.select(this)
+                                .style("fill", "#CDEEFC");
+                                tooltip
+                                .style("left", (event.x)/2-100 + "px")
+                                .style("top", (event.y)/2 + "px")
+                            }
+                            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+                            const hideTooltip = function(event,d) {
+                                tooltip
+                                .transition()
+                                .duration(100)
+                                .style("opacity", 0)
+                            }
+
+                        g.selectAll(".bar")
+                            .data(data)
+                            .enter().append("rect")
+                            .attr("class", "bar")
+                            .attr("x", function(d) { return xScale(d.offset); })
+                            .attr("y", function(d) { return yScale(d.value); })
+                            .attr("width", xScale.bandwidth())
+                            .attr("height", function(d) { return height - yScale(d.value); })
+                            .style("fill", "#CDEEFC")
+                            .on("mouseover", showTooltip )
+                            .on("mouseout", moveTooltip )
+                            .on("mouseleave", hideTooltip );
+
+                            send_data = {area: 1, element: "Moist", unit: unit_select, TimeStart: start_before, TimeEnd: end_before};
+                            $.post('/statistical_table', send_data, function(data_before) {
+                                var x = d3.scaleBand().range ([0, width]).padding(0.05),
+                                y = d3.scaleLinear().range ([height, 0]);
+
+                                x.domain(data.map(function(d) { return d.offset; }));
+                                y.domain([0, 100]);
+
+                                g.append("path")
+                                    .datum(data_before)
+                                    .attr("fill", "none")
+                                    .attr("stroke", "#2FB8F2")
+                                    .attr("stroke-width", 0.75)
+                                    .attr("d", d3.line()
+                                        .x(function(d) { return x(d.offset);})
+                                        .y(function(d) { return y(d.value);})
+                                    );
+                            });
+                                
+                        });
+
+                    send_data = {area: 1, element: "Light", unit: unit_select, TimeStart: start, TimeEnd: end};
+                    $.post('/statistical_table', send_data, function(data) {
+
+                            console.log(data)
+
+                            var xScale = d3.scaleBand().range ([0, width]).padding(0.05),
+                                yScale = d3.scaleLinear().range ([height, 0]);
+
+                            var g = svg_light.append("g")
+                                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                            xScale.domain(data.map(function(d) { return d.offset; }));
+                            yScale.domain([0, 800]);
+
+                            // g.append("g")
+                            // .attr("transform", "translate(0," + height + ")")
+                            // .call(d3.axisBottom(xScale))
+                            // .attr("font-family", "Manrope");
+
+                            g.append("g")
+                            .call(d3.axisLeft(yScale).tickFormat(function(d){
+                                return  d + "Lux";
+                            }).ticks(10))
+                            .append("text")
+                            .attr("y", 6)
+                            .attr("text-anchor", "end")
+                            .text("value")
+                            .attr("font-family", "Manrope");
+
+                            const tooltip = d3.select("#histogram_light")
+                                .append("div")
+                                .attr("id", "tip_light")
+                                .style("opacity", 0)
+                                .attr("class", "tooltip")
+                                .style("background-color", "#5DB075")
+                                .style("color", "white")
+                                .style("border-radius", "5px")
+                                .style("padding", "10px")
+
+                            // A function that change this tooltip when the user hover a point.
+                            // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+                            const showTooltip = function(event,d) {
+                                d3.select(this)
+                                .style("fill", "#FAD200");
+                                tooltip
+                                .transition()
+                                .duration(100)
+                                .style("opacity", 1)
+                                tooltip
+                                .html(d.time)
+                                .style("left", 100 + "px")
+                                .style("top", 2 + "px")
+                            }
+                            const moveTooltip = function(event,d) {
+                                d3.select(this)
+                                .style("fill", "#FDF877");
+                                tooltip
+                                .style("left", (event.x)/2-100 + "px")
+                                .style("top", (event.y)/2 + "px")
+                            }
+                            // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+                            const hideTooltip = function(event,d) {
+                                tooltip
+                                .transition()
+                                .duration(100)
+                                .style("opacity", 0)
+                            }
+
+                            g.selectAll(".rect")
+                                .data(data)
+                                .enter().append("rect")
+                                .attr("class", "bar")
+                                .attr("x", function(d) { return xScale(d.offset); })
+                                .attr("y", function(d) { return yScale(d.value); })
+                                
+                                .attr("width", xScale.bandwidth())
+                                .attr("height", function(d) { return height - yScale(d.value); })
+                                .style("fill", "#FDF877")
+                                .on("mouseover", showTooltip )
+                                .on("mouseout", moveTooltip )
+                                .on("mouseleave", hideTooltip );
+                                send_data = {area: 1, element: "Light", unit: unit_select, TimeStart: start_before, TimeEnd: end_before};
+                                $.post('/statistical_table', send_data, function(data_before) {
+                                    g.append("path")
+                                        .datum(data_before)
+                                        .attr("fill", "none")
+                                        .attr("stroke", "#FAD200")
+                                        .attr("stroke-width", 0.75)
+                                        .attr("d", d3.line()
+                                            .x(function(d) { return xScale(d.offset);})
+                                            .y(function(d) { return yScale(d.value);})
+                                        );
+                                });
+                                    
+                                
+                    });
+                    var textName;
+                    if (type == "year") textName = "trong năm " + select_Time;
+                    else if (type == "month") textName = "trong tháng " + select_Time;
+                    else textName = "trong ngày " + select_Time;
+                    svg_light.append("text").attr("x", 20).attr("y", 35).text("Ánh sáng " + textName).style("font-size", "16px").style("font-family", "Manrope").style("font-weight", "600").attr("alignment-baseline","middle");
+                    svg_moist.append("text").attr("x", 20).attr("y", 35).text("Độ ẩm " + textName).style("font-size", "16px").attr("font-family", "Manrope").style("font-weight", "600").attr("alignment-baseline","middle");
+                    svg_temp.append("text").attr("x", 20).attr("y", 35).text("Nhiệt độ " + textName).style("font-size", "16px").style("font-family", "Manrope").style("font-weight", "600").attr("alignment-baseline","middle");
+
+                    send_data = {area: 1, element: "pumper", unit: unit_select, TimeStart: start, TimeEnd: end};
+                    $.post('/statistical_table', send_data, function(data) {  
+                        console.log(data)
+                        var innerRadius = 100
+                        var width = 350
+
+                        var outerRadius = width/2
+
+                        d3.select("#pumper_").remove();
+
+                        //Create SVG element
+                        var color = d3.scaleOrdinal(['#74C476','#238B45','#41AB5D','#CAF4CB']);
+
+                        var svg = d3.select("#pie_pumper")
+                            .append("svg")
+                            .attr("id", "pumper_")
+                            .attr("width", width)
+                            .attr("height", width)
+                        // pie layout function
+                        var pie = d3.pie()
+                        var piedata = pie(data.map(function(d) { return d.value; }))
+                        //Set up pie groups
+                        var arcs = svg.selectAll("g")
+                                .data(piedata)
+                                .enter()
+                                .append("g")
+                                .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")")
+                        // Create arc function with parameters
+                        var arc = d3.arc()
+                                .innerRadius(innerRadius)
+                                .outerRadius(outerRadius);
+                        // Draw arc paths
+
+                        let mouseOver = function(d) {
+                                d3.selectAll(".Country_1")
+                                .transition()
+                                .duration(200)
+                                .style("opacity", .5)
+                                d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .style("opacity", 1)
+                            }
+
+                        let mouseLeave = function(d) {
+                                d3.selectAll(".Country_1")
+                                .transition()
+                                .duration(200)
+                                .style("opacity", .8)
+                                d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .style("stroke", "transparent")
+                            }
+
+                        arcs.append("path")
+                            .attr("d", arc)
+                            .attr("fill", function(d, i) {
+                                    return color(i);
+                                })
+                            .attr("class", function(d){ return "Country_1" } )
+                            .style("opacity", .8)
+                            .on("mouseover", mouseOver )
+                            .on("mouseleave", mouseLeave );
+
+                        arcs.append("text")
+                        .attr("transform", function(d) {
+                        return "translate(" + arc.centroid(d) + ")"
+                        })
+                        .attr("text-anchor", "end")
+                        .text(function(d) {return d.value.toFixed() + "%"})
+                        .style("color", "white");
+                            
+                        
+                        svg.append("circle").attr("cx",130).attr("cy",140).attr("r", 6).style("fill", "#238B45")
+                        svg.append("circle").attr("cx",130).attr("cy",170).attr("r", 6).style("fill", "#41AB5D")
+                        svg.append("circle").attr("cx",130).attr("cy",200).attr("r", 6).style("fill", "#74C476")
+                        
+                        svg.append("text").attr("x", 140).attr("y", 140).text("Tưới thủ công").style("font-size", "15px").style("font-family", "Manrope").style("font-weight", "300").attr("alignment-baseline","middle")
+                        svg.append("text").attr("x", 140).attr("y", 170).text("Tưới tự động").style("font-size", "15px").style("font-family", "Manrope").style("font-weight", "300").attr("alignment-baseline","middle")
+                        svg.append("text").attr("x", 140).attr("y", 200).text("Tưới định kì").style("font-size", "15px").style("font-family", "Manrope").style("font-weight", "300").attr("alignment-baseline","middle")
+                    })      
+                
+                    {
+                        var visualization = document.getElementById("area");
+                        visualization.innerHTML = `
+                            <svg id="area_pum" height="450" width="550"></svg>
+                            `;
+
+                        const svg = d3.select("#area_pum"),
+                        width = 400,
+                        height = 400;
+
+                        // Map and projection
+                        const path = d3.geoPath();
+                        const projection = d3.geoMercator()
+                        .scale(900)
+                        .center([101,20])
+                        .translate([width / 2, height / 2]);
+
+                        let colorScale = d3.scaleThreshold()
+                            .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
+                            .range(d3.schemeGreens[7]);
+
+
+                        svg.append("circle").attr("cx",370).attr("cy",170).attr("r", 6).style("fill", "#A1D99B")
+                        svg.append("circle").attr("cx",370).attr("cy",200).attr("r", 6).style("fill", "#74C476")
+                        svg.append("circle").attr("cx",370).attr("cy",230).attr("r", 6).style("fill", "#41AB5D")
+                        svg.append("circle").attr("cx",370).attr("cy",260).attr("r", 6).style("fill", "#238B45")
+                        
+                        svg.append("text").attr("x", 380).attr("y", 170).text("100-1000").style("font-size", "15px").style("font-family", "Manrope").style("font-weight", "300").attr("alignment-baseline","middle")
+                        svg.append("text").attr("x", 380).attr("y", 200).text("1000-10000").style("font-size", "15px").style("font-family", "Manrope").style("font-weight", "300").attr("alignment-baseline","middle")
+                        svg.append("text").attr("x", 380).attr("y", 230).text("10000-30000").style("font-size", "15px").style("font-family", "Manrope").style("font-weight", "300").attr("alignment-baseline","middle")
+                        svg.append("text").attr("x", 380).attr("y", 260).text("30000-100000").style("font-size", "15px").style("font-family", "Manrope").style("font-weight", "300").attr("alignment-baseline","middle")
+
+                        svg.append("text").attr("x", 20).attr("y", 35).text("Lượng nước sử dụng").style("font-size", "18px").style("font-family", "Manrope").style("font-weight", "600").attr("alignment-baseline","middle")
+                        let data = new Map();
+                        send_data = {TimeStart: start, TimeEnd: end};
+                        // $.post('/statistical_area', send_data, function(data) {});
+
+                        Promise.all([
+                        d3.json("http://127.0.0.1:5000/static/libs/area.json"),
+                        $.post('/statistical_area', send_data, function(d) {
+                            for (let i = 0; i < d.length; i++){
+                                console.log(d[i]);
+                                data.set(d[i].code, +d[i].pop)
+                            }
+                        })
+                        ]).then(function(loadData){
+                            let topo = loadData[0]
+                            console.log(loadData)
+
+                            let mouseOver = function(d) {
+                                d3.selectAll(".Country")
+                                .transition()
+                                .duration(200)
+                                .style("opacity", .5);
+                                d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .style("opacity", 1);
+                            }
+
+                            let mouseLeave = function(d) {
+                                d3.selectAll(".Country")
+                                .transition()
+                                .duration(200)
+                                .style("opacity", .8)
+                                d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .style("stroke", "white")
+                            }
+
+                            
+                            // Draw the map
+                        svg.append("g")
+                            .selectAll("path")
+                            .data(topo.features)
+                            .join("path")
+                            // draw each country
+                            .attr("d", d3.geoPath()
+                                .projection(projection)
+                            )
+                            // set the color of each country
+                            .attr("fill", function (d) {
+                                d.total = data.get(d.id) || 0;
+                                return colorScale(d.total);
+                            })
+                            .style("stroke", "transparent")
+                            .attr("class", function(d){ return "Country" } )
+                            .style("opacity", .8)
+                            .on("mouseover", mouseOver )
+                            .on("mouseleave", mouseLeave );
+                        })
+                    }
+                }    
+
+        </script>
+        
+    </body>
+
+</html>
+
+
+

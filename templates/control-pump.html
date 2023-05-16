@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="static/libs/jquery.min.js"></script>
+        <title>control_pump</title>
+		<link rel="stylesheet" href="http://127.0.0.1:5000/static/css/statictical-table.css">
+    </head>
+
+
+    <body>
+        <nav class = "navbar">
+            <div class = nav-bar-1></div>
+    
+            <div class = "DieuHuong_control_pump">
+                <img class = "nav_move" src = "http://127.0.0.1:5000/static/img/Navbar.png" alt = "Vector" />
+            </div>
+    
+            <div class = "logo">
+                <img class = "irrigation" src = "http://127.0.0.1:5000/static/img/irrigation.png" alt="Irrigation" />
+                <h1 class = "title">SFARM</h1>
+            </div>
+    
+            <ul class = "overlap-group5">
+                <div class = "navnav">
+                    <img class = "vector" src = "http://127.0.0.1:5000/static/img/vector.png" alt = "Vector" />
+                    <a href="{{ url_for('home') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Trang chủ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "icon-person" src = "http://127.0.0.1:5000/static/img/icon-person.png" alt='icon "person"' />
+                    <a href="{{ url_for('profile') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Hồ sơ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "water-pipe" src = "http://127.0.0.1:5000/static/img/water-pipe.png" alt = "Water pipe" />
+                    <a href="{{ url_for('control_pump') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Máy bơm</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-2 vector-3" src = "http://127.0.0.1:5000/static/img/vector-2.png" alt="Vector" />
+                    <a href="{{ url_for('period') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới định kì</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "calculator" src = "http://127.0.0.1:5000/static/img/Calculator.png" alt="Calculator" />
+                    <a href="{{ url_for('auto') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới tự động</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-1 vector-3" src = "http://127.0.0.1:5000/static/img/vector-1.png" alt="Vector" />
+                    <a href="{{ url_for('statis') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Thống kê</a>
+                </div>
+            </ul>
+        </nav>
+        <p id = "messages"></p>
+        <div class="container">
+            <div class="header">
+                <span class = "title_header">MÁY BƠM</span>
+                <img src="http://127.0.0.1:5000/static/img/notify.svg" type = "button" onClick = "showMessages()" alt="">
+                <div class="user">
+                    <img class = "avatar" src="http://127.0.0.1:5000/static/img/img.png" alt="">
+                    <span class = "UserName">{{session.UserName}}</span>
+                </div>
+                <a href="{{ url_for('logout') }}"> <img src="http://127.0.0.1:5000/static/img/icon _sign out_.svg" alt="Logout"></a>
+            </div>
+    
+            <div class = "set-up">
+                <div class = "box_control_pump Textsearch valign-text-middle manrope-norma-suva-white-30px">Cài đặt thời lượng bơm</div>
+                <div class = "box" id = "box">
+                        <input id = "minus" type="number" min="000" max="999" step="1" value="00" class = "box_time manrope-norma-suva-gray-50px"/>
+                        <div class = 'manrope-norma-suva-gray-50px' style="margin-left: 10px; margin-right: 10px">:</div>
+                        <input id = "second" type="number" min="000" max="60" step="1" value="00" class = "box_time manrope-norma-suva-gray-50px"/>
+                        <div class = "manrope-norma-suva-gray-50px" style="margin-left: 10px">GIÂY</div>
+                </div>
+    
+                <select class = "area_pump Textsearch valign-text-middle manrope-semi-bold-green-24px" id = "select_area_pump" >
+                    {% for area in area %}
+                    <option value="{{area.A_ID}}">{{area.Name}} </option>
+                    {% endfor %}
+                </select>   
+            </div>
+    
+            <button class = "Bom Green_50px background_white" onclick = "Control_pump()" id = "Bom">BƠM</button>
+            <!-- <button class = "Ngung White_50px" onlick = "Inative_pump()" id = "Dung">DỪNG</button> -->
+        </div>
+
+         <script>
+                function showMessages(){
+                    var mess = document.getElementById("messages");
+                    $.post('/getMessages', senddata, function(data){
+
+                    })
+                }
+               
+                
+                let check = setInterval(function()
+                {
+                    var bom = document.getElementById("Bom");
+                    let area_id = document.getElementById("select_area_pump").value;
+                    let senddata = {A_Id : area_id};
+                    $.post('/pump_respone', senddata, function(data){
+                        console.log(data)
+                            if(data[0].status == "Đang hoạt động") {
+                                // $("#box").empty();
+                                // $("#box").append("Some appended text");
+
+                                bom.classList.add("active_pump");
+                                bom.classList.remove("background_white");
+                                bom.classList.remove("Green_50px");
+                                bom.classList.add("White_50px");
+                                bom.classList.add("background_green");
+                                bom.innerText = "DỪNG";
+                            }
+
+                            else {
+                                bom.classList.remove("active_pump");
+                                bom.classList.remove("White_50px");
+                                bom.classList.remove("background_green");
+                                bom.classList.add("background_white");
+                                bom.classList.add("Green_50px");
+                                bom.innerText = "BƠM";
+                            }
+                        })
+                }, 1000);
+               
+               
+                function Control_pump(){
+                    var bom = document.getElementById("Bom");
+                    let area_id = document.getElementById("select_area_pump").value;
+                    let minus = document.getElementById("minus").value;
+                    let second = document.getElementById("second").value;
+                    let senddata = {A_Id : area_id, Minus: minus, Second: second};
+                    if(bom.textContent == "BƠM"){
+                        alert("bật máy bơm")
+                        $.post('/active_pump', senddata, function(data){
+                        })
+                    }
+                    
+                    else{
+                        $.post("/inactive_pump", senddata, function(data){
+                            alert("tắt máy bơm")
+                        })
+                    }
+                };
+            </script>
+    </body>
+</html>

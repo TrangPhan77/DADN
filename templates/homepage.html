@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="http://127.0.0.1:5000/static/css/home.css">
+    <link rel="stylesheet" href="http://127.0.0.1:5000/static/css/statictical-table.css">
+    <script src="static/libs/jquery.min.js"></script>
+</head>
+<body>
+    <nav class = "navbar">
+        <div class = nav-bar-1></div>
+
+        <div class = "DieuHuong_homepage">
+            <img class = "nav_move" src = "http://127.0.0.1:5000/static/img/Navbar.png" alt = "Vector" />
+        </div>
+
+        <div class = "logo">
+            <img class = "irrigation" src = "http://127.0.0.1:5000/static/img/irrigation.png" alt="Irrigation" />
+            <h1 class = "title">SFARM</h1>
+        </div>
+
+        <ul class = "overlap-group5">
+            <div class = "navnav">
+                <img class = "vector" src = "http://127.0.0.1:5000/static/img/vector.png" alt = "Vector" />
+                <a href="{{ url_for('home') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Trang chủ</a>
+            </div>
+
+            <div class = "navnav">
+                <img class = "icon-person" src = "http://127.0.0.1:5000/static/img/icon-person.png" alt='icon "person"' />
+                <a href="{{ url_for('profile') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Hồ sơ</a>
+            </div>
+
+            <div class = "navnav">
+                <img class = "water-pipe" src = "http://127.0.0.1:5000/static/img/water-pipe.png" alt = "Water pipe" />
+                <a href="{{ url_for('control_pump') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Máy bơm</a>
+            </div>
+
+            <div class = "navnav">
+                <img class = "vector-2 vector-3" src = "http://127.0.0.1:5000/static/img/vector-2.png" alt="Vector" />
+                <a href="{{ url_for('period') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới định kì</a>
+            </div>
+
+            <div class = "navnav">
+                <img class = "calculator" src = "http://127.0.0.1:5000/static/img/Calculator.png" alt="Calculator" />
+                <a href="{{ url_for('auto') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới tự động</a>
+            </div>
+
+            <div class = "navnav">
+                <img class = "vector-1 vector-3" src = "http://127.0.0.1:5000/static/img/vector-1.png" alt="Vector" />
+                <a href="{{ url_for('statis') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Thống kê</a>
+            </div>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <div class="main-part">
+            <div class="header">
+                <span class = "title_header">TRANG CHỦ</span>
+                <img src="http://127.0.0.1:5000/static/img/notify.svg" alt="">
+                <div class="user">
+                    <img src="http://127.0.0.1:5000/static/img/img.png" alt="">
+                    <span class = "UserName">{{session.UserName}}</span>
+                </div>
+                <a href="{{ url_for('logout') }}"> <img src="http://127.0.0.1:5000/static/img/icon _sign out_.svg" alt="Logout"></a>
+            </div>
+            
+            <div class="dash-board">
+                <select name="" id="area">
+                    {% for area in area %}
+                    <option value="{{area.Name}}">{{area.Name}} </option>
+                    {% endfor %}
+                </select>
+                <div class="board">
+                    <div class="row">
+                        <div class="card1">
+                            <div class="title">
+                                <p id = "temp">{{temp_record[0].data}}</p>
+                            </div>
+                            <div class="content">
+                                <p>Nhiệt độ (oC)</p>
+                            </div>
+                        </div>
+                        <div class="card2">
+                            <div class="title">
+                                <p id = "moist">{{moist_record[0].data}}</p>
+                            </div>
+                            <div class="content">
+                                <p>Độ Ẩm (%)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="card3">
+                            <div class="title">
+                                <p id = "light">{{light_record[0].data}}</p>
+                            </div>
+                            <div class="content">
+                                <p>Ánh sáng (oK)</p>
+                            </div>
+                        </div>
+                        <div class="card4">
+                            <div class="title">
+                                <p>MÁY BƠM</p>
+                            </div>
+                            <div class="content">
+                                <p id = "status">{{status[0].Status}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <script>
+        var check = setInterval(update(), 1000);
+
+        function update() {
+            sendata = {ID: 1};
+            $.get('/homepage', sendata, function(data){
+                console.log(data)
+                document.getElementById('temp').innerText = data[0].temp;
+                document.getElementById('light').innerText = data[0].light;
+                document.getElementById('moist').innerText = data[0].moist;
+                document.getElementById('status').innerText = data[0].status;
+            })    
+        }
+                     
+              
+    </script>
+</body>
+</html>

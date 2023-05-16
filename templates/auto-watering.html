@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="http://127.0.0.1:5000/static/css/statictical-table.css">
+		<link rel="stylesheet" href="http://127.0.0.1:5000/static/css/auto-watering.css">
+		
+		<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css" />
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		
+    </head>
+
+
+    <body>
+        <nav class = "navbar">
+            <div class = nav-bar-1></div>
+    
+            <div class = "DieuHuong_auto">
+                <img class = "nav_move" src = "http://127.0.0.1:5000/static/img/Navbar.png" alt = "Vector" />
+            </div>
+    
+            <div class = "logo">
+                <img class = "irrigation" src = "http://127.0.0.1:5000/static/img/irrigation.png" alt="Irrigation" />
+                <h1 class = "title">SFARM</h1>
+            </div>
+    
+            <ul class = "overlap-group5">
+                <div class = "navnav">
+                    <img class = "vector" src = "http://127.0.0.1:5000/static/img/vector.png" alt = "Vector" />
+                    <a href="{{ url_for('home') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Trang chủ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "icon-person" src = "http://127.0.0.1:5000/static/img/icon-person.png" alt='icon "person"' />
+                    <a href="{{ url_for('profile') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Hồ sơ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "water-pipe" src = "http://127.0.0.1:5000/static/img/water-pipe.png" alt = "Water pipe" />
+                    <a href="{{ url_for('control_pump') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Máy bơm</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-2 vector-3" src = "http://127.0.0.1:5000/static/img/vector-2.png" alt="Vector" />
+                    <a href="{{ url_for('period') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới định kì</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "calculator" src = "http://127.0.0.1:5000/static/img/Calculator.png" alt="Calculator" />
+                    <a href="{{ url_for('auto') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới tự động</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-1 vector-3" src = "http://127.0.0.1:5000/static/img/vector-1.png" alt="Vector" />
+                    <a href="{{ url_for('statis') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Thống kê</a>
+                </div>
+            </ul>
+        </nav>
+        <div class = "container">
+            <div class="header">
+                <span class = "title_header">THIẾT LẬP TƯỚI TỰ ĐỘNG</span>
+                <img src="http://127.0.0.1:5000/static/img/notify.svg" alt="">
+                <div class="user">
+                    <img class = "avatar" src="http://127.0.0.1:5000/static/img/img.png" alt="">
+                    <span class = "UserName">{{session.UserName}}</span>
+                </div>
+                <a href="{{ url_for('logout') }}"> <img src="http://127.0.0.1:5000/static/img/icon _sign out_.svg" alt="Logout"></a>
+            </div>
+    <!--      ------------------------------------------------------------------------------------------   -->
+    <script>
+        
+        $.post("/auto_watering_response",null, function(data){
+            
+            container = "";
+            for(var i = 0; i < data.length; i++){
+                container += 
+                `<div class = "a-area">
+                    <div class = "dai-dien">
+                        <p class = "ten">${data[i].Name}</p>
+                        
+                        <button class = "xem-them-button" onclick = "an_hien_khung_chi_tiet(${data[i].ID_area});">
+                            <img onmouseover="bigImg(this)" onmouseout="normalImg(this)" class = "mo-rong" src = "http://127.0.0.1:5000/static/img/mo-rong-1.png" alt='icon "mo-rong"' />
+                        </button>
+                    </div>
+                    
+                    <div class = "khung-chi-tiet" id = "khung-chi-tiet-${data[i].ID_area}">
+                        <div class = "chi-tiet">
+                            <div class = "chi-tiet-nho">
+                                <p class = "input-do-am">Độ ẩm thấp nhất(%):</p>
+                                <p class = "input-do-am">Thời lượng tưới(phút):</p>
+                            </div>
+    
+                            <div class = "chi-tiet-nho">
+                                <input type = "number" min = "0" max = "100" class = "box_input" id = "input-do-am-${data[i].ID_area}">
+                                <input type = "number" min = "0" class = "box_input" id = "input-thoi-luong-${data[i].ID_area}">
+                            </div>
+                        </div>
+    
+                        <button class = "khung-xac-nhan" onclick = "xac_nhan(${data[i].ID_area});">
+                            <p class = "xac-nhan"> Xác nhận</p>
+                        </button>
+                    </div>
+                </div>`;
+                
+            };
+            document.querySelector(".main-auto-watering").innerHTML = container;
+            for(var i = 0; i < data.length; i++){
+                if (data[i].LowestHumidity == 0){
+                    document.getElementById("input-do-am-" + String(i+1)).value = 50;
+                    document.getElementById("input-thoi-luong-" + String(i+1)).value = 50;
+                }
+                else{
+                    document.getElementById("input-do-am-" + String(i+1)).value = data[i].LowestHumidity;
+                    document.getElementById("input-thoi-luong-" + String(i+1)).value = data[i].AutoWaterDuration ;
+                }
+            }
+                
+        })
+
+    </script>
+            <div class = "main-auto-watering">
+               
+    
+    <script>
+    function an_hien_khung_chi_tiet(i){
+        if(document.getElementById("khung-chi-tiet-" + String(i)).style.display == 'none'){
+            
+            document.getElementById("khung-chi-tiet-" + String(i)).style.display = 'flex';}
+    
+        else {document.getElementById("khung-chi-tiet-" + String(i)).style.display = 'none';}
+    }
+    
+    function xac_nhan(i){
+        if(document.getElementById("input-do-am-" + String(i)).value == "" ||
+        document.getElementById("input-thoi-luong-" + String(i)).value == ""){
+            alert("Không thể để trống thông tin");
+        }
+        else {
+            let do_am = document.getElementById("input-do-am-" + String(i)).value;
+            let thoi_luong = Number(document.getElementById("input-thoi-luong-" + String(i)).value);
+            
+            sendata = {A_ID: i, LowestHumidity: do_am, AutoWaterDuration: thoi_luong}
+            $.post('/auto_watering', sendata)
+            document.getElementById("khung-chi-tiet-" + String(i)).style.display = 'none';
+            alert("Đã xác nhận");
+        }
+        
+    }
+    </script>
+    <script>
+        function bigImg(x) {
+          x.style.height = "20px";
+          x.style.width = "40px";
+        }
+        
+        function normalImg(x) {
+          x.style.height = "10px";
+          x.style.width = "20px";
+        }
+        </script>
+        </div>
+    </body>
+
+</html>
+

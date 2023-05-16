@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="http://127.0.0.1:5000/static/css/statictical-table.css">
+		<link rel="stylesheet" href="http://127.0.0.1:5000/static/css/period-watering.css">
+		<script src="libs/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    </head>
+
+
+    <body>
+        <nav class = "navbar">
+            <div class = nav-bar-1></div>
+    
+            <div class = "DieuHuong_period">
+                <img class = "nav_move" src = "http://127.0.0.1:5000/static/img/Navbar.png" alt = "Vector" />
+            </div>
+    
+            <div class = "logo">
+                <img class = "irrigation" src = "http://127.0.0.1:5000/static/img/irrigation.png" alt="Irrigation" />
+                <h1 class = "title">SFARM</h1>
+            </div>
+    
+            <ul class = "overlap-group5">
+                <div class = "navnav">
+                    <img class = "vector" src = "http://127.0.0.1:5000/static/img/vector.png" alt = "Vector" />
+                    <a href="{{ url_for('home') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Trang chủ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "icon-person" src = "http://127.0.0.1:5000/static/img/icon-person.png" alt='icon "person"' />
+                    <a href="{{ url_for('profile') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Hồ sơ</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "water-pipe" src = "http://127.0.0.1:5000/static/img/water-pipe.png" alt = "Water pipe" />
+                    <a href="{{ url_for('control_pump') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Máy bơm</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-2 vector-3" src = "http://127.0.0.1:5000/static/img/vector-2.png" alt="Vector" />
+                    <a href="{{ url_for('period') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới định kì</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "calculator" src = "http://127.0.0.1:5000/static/img/Calculator.png" alt="Calculator" />
+                    <a href="{{ url_for('auto') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Tưới tự động</a>
+                </div>
+    
+                <div class = "navnav">
+                    <img class = "vector-1 vector-3" src = "http://127.0.0.1:5000/static/img/vector-1.png" alt="Vector" />
+                    <a href="{{ url_for('statis') }}" class = "navtext valign-text-middle manrope-medium-suva-gray-20px">Thống kê</a>
+                </div>
+            </ul>
+        </nav>
+
+        <div class = "container">
+            <div class="header">
+                <span class = "title_header">THIẾT LẬP LỊCH TƯỚI ĐỊNH KỲ</span>
+                <img src="http://127.0.0.1:5000/static/img/notify.svg" alt="">
+                <div class="user">
+                    <img class = "avatar" src="http://127.0.0.1:5000/static/img/img.png" alt="">
+                    <span class = "UserName">{{session.UserName}}</span>
+                </div>
+                <a href="{{ url_for('logout') }}"> <img src="http://127.0.0.1:5000/static/img/icon _sign out_.svg" alt="Logout"></a>
+            </div>
+            <!-- ------------------------------------------------------------------------------------------------------------------            -->
+            <script>
+                $.post('/auto_watering_response', null, function(data){
+                    console.log(data);
+                    container = "";
+                    for (let i = 0; i < data.length; i++){
+                        container += 
+                        `<div class = "p-area" id = "area-${data[i].ID_area}">
+                            <div class = "dai-dien dinh-dang-area">
+                                <p class = "ten dinh-dang-chu">${data[i].Name}</p>
+                                
+                                <button class = "xem-them-button" id = "xem-them-button-1" onclick = "an_hien_khung_chi_tiet(${data[i].ID_area});">
+                                    <img onmouseover="bigImg(this)" onmouseout="normalImg(this)" class = "mo-rong" src = "http://127.0.0.1:5000/static/img/mo-rong-1.png" alt='icon "mo-rong"' />
+                                </button>
+                            </div>
+                            
+                            <div class = "khung-chi-tiet" id = "khung-chi-tiet-${data[i].ID_area}">
+                            
+                                <div class = "chi-tiet">
+                                    <div class = "dinh-danh">
+                                        <p class = "mo-ta mo-ta-them">Thêm tưới định kỳ</p>
+                                    </div>
+                                    
+                                    <button class = "add" id = "add-${data[i].ID_area}" onclick = "an_hien_them_cai_dat(${data[i].ID_area});">
+                                        <img class = "icon-add" src = "http://127.0.0.1:5000/static/img/Plus.png" alt='icon "add"' />
+                                    </button>
+                                </div>
+                                
+                                <div class = "cai-dat" id = "cai-dat-${data[i].ID_area}">
+                                    <div class = "info">
+                                        <div class = "ten-dai-dien">
+                                            <p class = "ten-chi-tiet">Thời lượng tưới</p>
+                                        </div>
+                                        
+                                        <input type="number" min = "0" class = "input-time" id = "input-time-${data[i].ID_area}-1">
+            
+                                        <p class = "time">PHÚT</p>
+                                    </div>
+            
+                                    <div class = "info">
+                                        <div class = "ten-dai-dien">
+                                            <p class = "ten-chi-tiet">Thời gian tưới</p>
+                                        </div>
+                                        
+                                        <input type="number" min = "0" max = "23" class = "input-time" id = "input-time-${data[i].ID_area}-2">
+            
+                                        <p class = "time">:</p>
+                                        
+                                        <input type="number" min = "0" max = "59" class = "input-time" id = "input-time-${data[i].ID_area}-3">
+            
+                                    </div>
+            
+                                    <div class = "info">
+                                        <div class = "ten-dai-dien">
+                                            <p class = "ten-chi-tiet">Chu kỳ tưới</p>
+                                        </div>
+            
+                                        <select id = "select-${data[i].ID_area}-2">
+                                            <option value= 1>Mỗi ngày</option>
+                                            <option value= 2>2 ngày</option>
+                                            <option value= 3>3 ngày</option>
+                                            <option value= 7>Mỗi tuần</option>
+                                            <option value= 14>2 tuần</option>
+                                            <option value= 30>Mỗi tháng</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button class = "button-xac-nhan" onclick = "xac_nhan_cai_dat(${data[i].ID_area});">
+                                        <p class = "xac-nhan">Xác nhận</p>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                        
+                        }
+                        document.querySelector(".main-period-watering").innerHTML = container
+                });   
+            </script>
+            <div class = "main-period-watering"></div>
+            <!-- ẩn hiện khung chi tiết -->
+            
+            <script>
+                function an_hien_khung_chi_tiet(i){
+                    if(document.getElementById("khung-chi-tiet-" + String(i)).style.display == 'none'){
+                        document.getElementById("khung-chi-tiet-" + String(i)).style.display = 'flex';
+                        
+                        tao_lich_tuoi(i, 0);
+                    }
+                    else { 
+                        var element = document.getElementById('khung-chi-tiet-' + String(i));
+                        element.innerHTML = `
+                        <div class = "chi-tiet">
+                            <div class = "dinh-danh">
+                                <p class = "mo-ta mo-ta-them">Thêm tưới định kỳ</p>
+                            </div>
+                            
+                            <button class = "add" id = "add-${i}" onclick = "an_hien_them_cai_dat(${i});">
+                                <img class = "icon-add" src = "http://127.0.0.1:5000/static/img/Plus.png" alt='icon "add"' />
+                            </button>
+                        </div>
+                        
+                        <div class = "cai-dat" id = "cai-dat-${i}">
+                            <div class = "info">
+                                <div class = "ten-dai-dien">
+                                    <p class = "ten-chi-tiet">Thời lượng tưới</p>
+                                </div>
+                                
+                                <input type="number" min = "0" class = "input-time" id = "input-time-${i}-1">
+    
+                                <p class = "time">PHÚT</p>
+                            </div>
+    
+                            <div class = "info">
+                                <div class = "ten-dai-dien">
+                                    <p class = "ten-chi-tiet">Thời gian tưới</p>
+                                </div>
+                                
+                                <input type="number" min = "0" max = "23" class = "input-time" id = "input-time-${i}-2">
+    
+                                <p class = "time">:</p>
+                                
+                                <input type="number" min = "0" max = "59" class = "input-time" id = "input-time-${i}-3">
+                            </div>
+    
+                            <div class = "info">
+                                <div class = "ten-dai-dien">
+                                    <p class = "ten-chi-tiet">Chu kỳ tưới</p>
+                                </div>
+    
+                                <select id = "select-${i}-2">
+                                    <option value = 1>Mỗi ngày</option>
+                                    <option value = 2>2 ngày</option>
+                                    <option value = 3>3 ngày</option>
+                                    <option value = 7>Mỗi tuần</option>
+                                    <option value= 14>2 tuần</option>
+                                    <option value= 30>Mỗi tháng</option>
+                                </select>
+                            </div>
+                            
+                            <button class = "button-xac-nhan" onclick = "xac_nhan_cai_dat(${i});">
+                                <p class = "xac-nhan">Xác nhận</p>
+                            </button>
+                        </div>`
+                        document.getElementById("cai-dat-" + String(i)).style.display = 'none';
+                        document.getElementById("khung-chi-tiet-" + String(i)).style.display = 'none';
+                    }
+                    
+                    
+                }
+            </script>
+            <!-- ẩn hiện thêm cài đặt -->
+            <script>
+                function an_hien_them_cai_dat(i){
+                    if(document.getElementById("cai-dat-" + String(i)).style.display == 'none')
+                    
+                        {document.getElementById("cai-dat-" + String(i)).style.display = 'flex';
+                        document.getElementById("input-time-"+String(i)+"-1").value = "";
+                        document.getElementById("input-time-"+String(i)+"-2").value = "";
+                        document.getElementById("input-time-"+String(i)+"-3").value = "";
+                        document.getElementById("select-"+String(i)+"-2").value = 1;
+                    }
+            
+                    else {document.getElementById("cai-dat-" + String(i)).style.display = 'none';}
+                }
+            </script>
+            <!-- xác nhận cài đặt -->
+            <script>
+                function xac_nhan_cai_dat(i){
+                    if(document.getElementById("input-time-" + String(i) + "-1").value == ""||
+                    document.getElementById("input-time-" + String(i) + "-2").value== ""||
+                    document.getElementById("input-time-" + String(i) + "-3").value == ""){
+                        alert("Không thể để trống thông tin");
+                    }
+                    else {
+                    document.getElementById("cai-dat-" + String(i)).style.display = 'none' ;
+                    let thoi_luong = Number(document.getElementById("input-time-" + String(i) + "-1").value);
+                    let thoi_gian = Number(document.getElementById("input-time-" + String(i) + "-2").value)*60
+                               + Number(document.getElementById("input-time-" + String(i) + "-3").value);
+                    let chu_ky = document.getElementById("select-" + String(i) + "-2").value;
+                    
+                    sendata = {Time : thoi_gian, Duration : thoi_luong, Cycle : chu_ky, A_ID : i};
+                    $.post('/period_watering', sendata);
+                    alert("Đã xác nhận");
+                    document.getElementById("input-time-"+String(i)+"-1").value = "";
+                    document.getElementById("input-time-"+String(i)+"-2").value = "";
+                    document.getElementById("input-time-"+String(i)+"-3").value = "";
+                    document.getElementById("select-"+String(i)+"-2").value = 1;
+                    tao_lich_tuoi(i, 1);
+                    }
+                    
+                }
+            </script>
+            <!-- bật tắt tưới định kỳ -->
+            <script>
+                function xoa_lich_tuoi(a,i){
+                    if(confirm("Bạn chắc chắn muốn xóa lịch tưới này?")){
+                        sendata = {SST: a};
+                    $.post('/period_remove', sendata);
+                    var khung_element = document.getElementById('khung-chi-tiet-'+ String(i));
+                    var element = document.getElementById('chi-tiet-'+ String(a));
+                    khung_element.removeChild(element);
+                    }
+                    else return a;
+                }
+                function sua_lich_tuoi(a,i){
+                    console.log(a);
+                    if (document.getElementById("input-time-"+String(i)+"-1").value != ""){
+                        if(confirm("Bạn vẫn chưa xác nhận lần chỉnh sửa trước. Bạn có chắc muốn bỏ lịch tưới này?")){
+                            var khung_element = document.getElementById('khung-chi-tiet-'+ String(i));
+                            var element = document.getElementById('chi-tiet-'+ String(a));
+                            khung_element.removeChild(element);
+                            sendata = {SST: a};
+                            $.post('/period_response_schedual', sendata, function(data){
+                                document.getElementById("cai-dat-" + String(i)).style.display = 'flex';
+                                document.getElementById("input-time-"+String(i)+"-1").value = data[0].Duration;
+                                document.getElementById("input-time-"+String(i)+"-2").value = Math.floor(data[0].Time/60);
+                                document.getElementById("input-time-"+String(i)+"-3").value = data[0].Time%60;
+                                document.getElementById("select-"+String(i)+"-2").value = data[0].Cycle;
+                            })
+                            $.post('/period_remove', sendata)
+                        }
+                        else return 0;
+                    }
+                    else {
+                        var khung_element = document.getElementById('khung-chi-tiet-'+ String(i));
+                            var element = document.getElementById('chi-tiet-'+ String(a));
+                            khung_element.removeChild(element);
+                            sendata = {SST: a};
+                            $.post('/period_response_schedual', sendata, function(data){
+                                
+                                document.getElementById("input-time-"+String(i)+"-1").value = data[0].Duration;
+                                document.getElementById("input-time-"+String(i)+"-2").value = Math.floor(data[0].Time/60);
+                                document.getElementById("input-time-"+String(i)+"-3").value = data[0].Time%60;
+                                document.getElementById("select-"+String(i)+"-2").value = data[0].Cycle;
+                                document.getElementById("cai-dat-" + String(i)).style.display = 'flex';
+                            })
+                            $.post('/period_remove', sendata)
+                    }
+                    
+                    
+                }
+            </script>
+            <!-- tạo lịch tưới -->
+            <script>
+                function tao_lich_tuoi(i, t){
+                    sendata = {A_ID : i};
+                        $.post('/period_watering_response', sendata, function(data){
+                            console.log(data);
+                            if (t == 1){
+                                var html = document.getElementById("khung-chi-tiet-" + String(i));
+                                    let l = data.at(-1);
+                                    var a = String(Math.floor(l.Time/60)) + ":" + String(l.Time % 60);
+                                    var b = l.Cycle;
+                                    var chu_ky = '';
+                                    if(b==1) chu_ky ="Mỗi ngày";
+                                    else if(b==2) chu_ky ="2 ngày";
+                                    else if (b==3) chu_ky ="3 ngày";
+                                    else if (b==7) chu_ky ="Mỗi tuần";
+                                    else if (b==14) chu_ky ="2 tuần";
+                                    else if (b==30) chu_ky ="Mỗi tháng";
+                                    var c = l.Duration;
+                                    var r= l.SST;
+                                    if (html){
+                                        var html_add_detail = `
+                                        <div class = "chi-tiet" id = "chi-tiet-${r}" >
+                                            <div class = "dinh-danh" onclick = "sua_lich_tuoi(${r},${i});">
+                                                <p class = "mo-ta mo-ta-them">${a}</p>
+                                                <p class = "mo-ta mo-ta-them">${c} phút</p>
+                                                <p class = "mo-ta mo-ta-them">${chu_ky}</p>
+                                            </div>
+                            
+                                            <button class = "add" id = "add-${r}" onclick = "xoa_lich_tuoi(${r},${i});">
+                                                <img class = "icon-add" id = "icon-add-${r}" src = "http://127.0.0.1:5000/static/img/Close.png" alt='icon "delete"' />
+                                            </button>
+                                        </div>
+                                        `;
+                    
+                                    html.insertAdjacentHTML('afterbegin', html_add_detail); 
+                                }
+                            }
+                            else for (let j = 0; j <data.length; j++){
+                                var html = document.getElementById("khung-chi-tiet-" + String(i));
+                                    
+                                    var a = String(Math.floor(data[j].Time/60)) + ":" + String(data[j].Time % 60);
+                                    var b = data[j].Cycle;
+                                    var chu_ky = '';
+                                    if(b==1) chu_ky ="Mỗi ngày";
+                                    else if(b==2) chu_ky ="2 ngày";
+                                    else if (b==3) chu_ky ="3 ngày";
+                                    else if (b==7) chu_ky ="Mỗi tuần";
+                                    else if (b==14) chu_ky ="2 tuần";
+                                    else if (b==30) chu_ky ="Mỗi tháng";
+                                    var c = data[j].Duration;
+                                    var r= data[j].SST;
+                                    if (html){
+                                        var html_add_detail = `
+                                        <div class = "chi-tiet" id = "chi-tiet-${r}" >
+                                            <div class = "dinh-danh" onclick = "sua_lich_tuoi(${r},${i});">
+                                                <p class = "mo-ta mo-ta-them">${a}</p>
+                                                <p class = "mo-ta mo-ta-them">${c} phút</p>
+                                                <p class = "mo-ta mo-ta-them">${chu_ky}</p>
+                                            </div>
+                            
+                                            <button class = "add" id = "add-${r}" onclick = "xoa_lich_tuoi(${r},${i});">
+                                                <img class = "icon-add" id = "icon-add-${r}" src = "http://127.0.0.1:5000/static/img/Close.png" alt='icon "delete"' />
+                                            </button>
+                                        </div>
+                                        `;
+                    
+                                    html.insertAdjacentHTML('afterbegin', html_add_detail); 
+                                }
+                            }  
+                        });   
+                    
+                } 
+            </script>
+            <script>
+                function bigImg(x) {
+                  x.style.height = "20px";
+                  x.style.width = "40px";
+                }
+                
+                function normalImg(x) {
+                  x.style.height = "10px";
+                  x.style.width = "20px";
+                }
+                </script>
+        </div>
+    </body>
+
+</html>
